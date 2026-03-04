@@ -46,7 +46,7 @@ class VectoreStore:
                 "filter": {'page': {'$in': self.filter_value}}
                 })
         else:
-            retriever = docsearch.as_retriever(search_type="mmr", search_kwargs={"k": 5})
+            retriever = docsearch.as_retriever(search_type="similarity", search_kwargs={"k": 8})
         return retriever
     
     def __call__(self):

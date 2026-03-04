@@ -1,28 +1,28 @@
-from langchain_classic.chains import ConversationalRetrievalChain 
-from langchain_classic.memory import ConversationBufferMemory 
-from langchain_classic.retrievers import MultiQueryRetriever
+
 from langchain_core.prompts import PromptTemplate
 from model import LLmModel, LangChainLLMWrapper
 from vectore_store import VectoreStore
 import model_config as conf
 
-def generate_exam_response(retriver, llm, num_questions=5, question_formate="draw circle (MCQ)", level="easy"):
-    prompt_template = conf.system_prompt
+def generate_exam_response(retriver, llm, topics=None, num_questions=5, level="easy"):
     prompt = PromptTemplate(
-        template=prompt_template, 
-        input_variables=["context", "question"]
+        template=conf.user_template, 
+        input_variables=["num_questions", "context", "level"]
     )
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    agent_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriver,
-        memory=memory,
-        combine_docs_chain_kwargs={"prompt": prompt}
-    )
-    formatted_query = f"Generate an exam with {str(num_questions)} questions, in the formate of {str(question_formate)}, and the difficulty level is {level}."
+
+    if topics:
+        search_query = ", ".join(topics)
+    else:
+        search_query = "main concept 'not important actually'"
+    
+    retrived_docs = retriver.invoke(search_query)
+    context_text = "\n\n".join([doc.page_content for doc in retrived_docs])
+    formatted_user_request = prompt.format(num_questions=num_questions, context=context_text, level=level)
+    final_prompt = conf.system_prompt + "\n\n" + formatted_user_request
+    response = llm.invoke(final_prompt)
 
     # context is generated automatically from ConversationalRetrievalChain, so we only need to pass the question
-    response = agent_chain.invoke({"question": formatted_query})
+    # response = agent_chain.invoke({"question": formatted_query})
     return response
 
 def main():
@@ -47,19 +47,23 @@ def main():
    
     if type == "pages":
         ret = VectoreStore(file_path="Stages_of_data_mining.pdf", filter_value=content, filter_type="pages")
-        retriver = ret()
+        
     else:
         ret = VectoreStore(file_path="Stages_of_data_mining.pdf", filter_value=content, filter_type="topics")
-        retriver = MultiQueryRetriever.from_llm(
-            llm=llm,
-            retriever=ret(),
-        )
+        # retriver = MultiQueryRetriever.from_llm(
+        #     llm=llm,
+        #     retriever=ret(),
+        # )
+
+    retriver = ret()
    
     print("Generating exam response...")
+    if type == "pages":
+        response = generate_exam_response(retriver, llm, num_questions=5, level="easy")
+    else:
+        response = generate_exam_response(retriver, llm, topics=content, num_questions=5, level="easy")
     
-    response = generate_exam_response(retriver, llm, num_questions=5, question_formate="draw circle (MCQ)", level="easy")
-    
-    print("response is:\n\n",response["answer"])
+    print("response is:\n\n",response)
 
 if __name__ == "__main__":
     main()

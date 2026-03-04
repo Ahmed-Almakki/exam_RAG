@@ -69,7 +69,9 @@ class LangChainLLMWrapper(LLM):
     def _call(self, prompt: str, stop: Optional[List[str]] = None, **kwargs: Any) -> str:
         # LangChain gives us a raw string prompt. 
         # We MUST format it into the dictionary list that Hugging Face expects!
-        messages = [{"role": "user", "content": prompt}]
-        
+        messages = [
+            {"role": "system", "content": config.system_prompt},
+            {"role": "user", "content": prompt}
+        ]
         # Call your custom PyTorch generation logic
         return self._model_instance.generate(messages, **kwargs)
