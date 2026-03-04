@@ -24,6 +24,12 @@ system_prompt = """
     USER REQUEST:
     {question}
 
+    RULES:
+    1. You MUST generate the exact number of questions requested in the instructions.
+    2. Do NOT stop until all requested questions are generated.
+    3. Do NOT include any external knowledge. 
+    4. You MUST use the exact format below for EVERY question.
+
     REQUIRED FORMAT:
     Question [Number]: [Write the question here]
     A) [Option A]
@@ -32,8 +38,8 @@ system_prompt = """
     D) [Option D]
     Correct Answer: [A/B/C/D]
 
-    EXAM:
-    Question 1:
+
+    BEGIN EXAM:
 """
 
 sys = """

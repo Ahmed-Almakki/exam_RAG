@@ -1,6 +1,9 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import model_config as config
+from typing import Any, List, Optional
+from langchain_core.language_models.llms import LLM
+from pydantic import PrivateAttr
 
 class LLmModel:
     tempreture = config.model_parameter['Temperature']
@@ -20,12 +23,12 @@ class LLmModel:
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
         ).to(self.device)
 
-    def generate(self, prompt, max_new_tokens=500, **kwargs):
-        formatted_sys = config.sys.replace("{question}", prompt)
-        message = [
-            {"role": "system", "content": formatted_sys},
-            {"role": "user", "content": prompt}
-        ]
+    def generate(self, message, max_new_tokens=500, **kwargs):
+        # formatted_sys = config.sys.replace("{question}", prompt)
+        # message = [
+        #     {"role": "system", "content": formatted_sys},
+        #     {"role": "user", "content": prompt}
+        # ]
         text = self.tokenizer.apply_chat_template(message, tokenize=False, enable_thinking=False, add_generation_prompt=True)
         print("text: ", text)
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
@@ -45,6 +48,28 @@ class LLmModel:
         return content
     
 
-llm = LLmModel()
-x = llm.generate("What is the capital of France?")
-print(x)
+# llm = LLmModel()
+# x = llm.generate("What is the capital of France?")
+# print(x)
+
+class LangChainLLMWrapper(LLM):
+    """A wrapper to make your custom LLmModel compatible with LangChain."""
+    
+    # We use PrivateAttr to prevent Pydantic validation errors on custom PyTorch objects
+    _model_instance: Any = PrivateAttr()
+
+    def __init__(self, model_instance: Any, **kwargs):
+        super().__init__(**kwargs)
+        self._model_instance = model_instance
+
+    @property
+    def _llm_type(self) -> str:
+        return "custom_huggingface_model"
+
+    def _call(self, prompt: str, stop: Optional[List[str]] = None, **kwargs: Any) -> str:
+        # LangChain gives us a raw string prompt. 
+        # We MUST format it into the dictionary list that Hugging Face expects!
+        messages = [{"role": "user", "content": prompt}]
+        
+        # Call your custom PyTorch generation logic
+        return self._model_instance.generate(messages, **kwargs)
