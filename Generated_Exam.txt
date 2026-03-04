@@ -1,0 +1,41 @@
+=== EXAM QUESTIONS ===
+
+Question 1: What is the objective of data preprocessing?
+
+A) To prepare and clean the raw data  
+B) To handle missing or incomplete data  
+C) To transform data into a suitable format  
+D) To normalize or scale numerical variables  
+
+
+Question 2: How many steps are involved in the data transformation phase?  
+
+A) 1  
+B) 2  
+C) 3  
+D) 4  
+
+
+Question 3: What is one task included in the data transformation stage?  
+
+A) Encode categorical variables  
+B) Create new features or attributes  
+C) Transform data into a suitable format  
+D) Handle outliers and noise  
+
+
+Question 4: What does pattern evaluation involve?  
+
+A) Accuracy of classification models  
+B) Statistical significance of patterns  
+C) Validating the reliability of clusters  
+D) Evaluating the effectiveness of models
+
+========================================
+
+=== ANSWER KEY ===
+
+Question 1 Correct Answer: A
+Question 2 Correct Answer: C
+Question 3 Correct Answer: C
+Question 4 Correct Answer: B

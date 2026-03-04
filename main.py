@@ -3,6 +3,7 @@ from langchain_core.prompts import PromptTemplate
 from model import LLmModel, LangChainLLMWrapper
 from vectore_store import VectoreStore
 import model_config as conf
+from print_exam import print_exam
 
 def generate_exam_response(retriver, llm, topics=None, num_questions=5, level="easy"):
     prompt = PromptTemplate(
@@ -59,11 +60,13 @@ def main():
    
     print("Generating exam response...")
     if type == "pages":
-        response = generate_exam_response(retriver, llm, num_questions=5, level="easy")
+        response = generate_exam_response(retriver, llm, num_questions=4, level="easy")
     else:
-        response = generate_exam_response(retriver, llm, topics=content, num_questions=5, level="easy")
+        response = generate_exam_response(retriver, llm, topics=content, num_questions=4, level="easy")
     
     print("response is:\n\n",response)
+
+    print_exam(response)
 
 if __name__ == "__main__":
     main()
