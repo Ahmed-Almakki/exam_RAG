@@ -2,7 +2,7 @@ import os
 
 
 base_model_path = os.path.expanduser("~/.cache/huggingface/hub/models--Qwen--Qwen3-0.6B/snapshots")
-embedding_model_path = os.path.expanduser("~/.cache/huggingface/hub/models--sentence-transformers--all-MiniLM-L6-v2")
+embedding_model_path = os.path.expanduser("~/.cache/huggingface/hub/models--sentence-transformers--all-MiniLM-L6-v2/snapshots/c9745ed1d9f207416be6d2e6f8de32d1f16199bf")
 model_path = os.path.join(base_model_path, os.listdir(base_model_path)[0])
 
 model_parameter = {
